@@ -33,6 +33,7 @@ namespace PrsServer.Controllers
             return await PutRequest(request.Id, request);
         }
 
+
         //PUT: api/Requests/APRROVE/5
         [HttpPut("Approve/{id}")]
         public async Task<IActionResult> SetStatustoApprove(int id, Request request) {
@@ -58,7 +59,7 @@ namespace PrsServer.Controllers
         }
 
         //GET: api/Requests/Review
-        [HttpGet("Review/{id}")]
+        [HttpGet("Review")]
         public async Task<IEnumerable<Request>> GetRequestinReview (int id) {
             return await _context.Requests
                 .Where(r => r.Status == "REVIEW" && r.UserId != id)
@@ -69,7 +70,12 @@ namespace PrsServer.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Request>>> GetRequest()
         {
-            return await _context.Requests.ToListAsync();
+            return await _context.Requests
+                .Include(u => u.User)
+                .Include(rl => rl.RequestLines)
+                .ThenInclude(p => p.Product)
+                .ThenInclude(v => v.Vendor)
+                .ToListAsync();
         }
 
         // GET: api/Requests/5

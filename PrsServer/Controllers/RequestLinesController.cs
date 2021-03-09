@@ -41,7 +41,10 @@ namespace PrsServer.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<RequestLine>>> GetRequestLine()
         {
-            return await _context.RequestLine.ToListAsync();
+            return await _context.RequestLine
+                .Include(p => p.Product)
+                .ThenInclude(v => v.Vendor)
+                .ToListAsync();
         }
 
         // GET: api/RequestLines/5
